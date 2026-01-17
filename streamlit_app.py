@@ -41,8 +41,21 @@ else:
             document = uploaded_file.read().decode()
         elif file_extension == 'pdf':
             document = pypdf.PdfReader(uploaded_file)
+            pages_text = []
+
+            for page in document.pages: 
+                page_text = page.extract_text() 
+                if page_text: 
+                    pages_text.append(page_text)
+            
+            document_text = "\n".join(pages_text)
+
+            if not document_text:
+                ("Could not extract text from this PDF.")
+                
         else:
             st.error("Unsupported file type.")
+    
 
         messages = [
             {
