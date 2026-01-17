@@ -1,6 +1,14 @@
 import streamlit as st
 from openai import OpenAI
-import pypdf
+import fitz
+
+#PDF extraction function
+def extract_text_from_pdf(uploaded_file):
+    document = fitz.open(stream=uploaded_file.read(), filetype="pdf")
+    text = ''
+    for page in document:
+        text += page.get_text()
+    return text
 
 # Show title and description.
 st.title("MY Document question answering")
@@ -39,20 +47,10 @@ else:
         file_extension = uploaded_file.name.split('.')[-1]
         if file_extension == 'txt':
             document = uploaded_file.read().decode()
+
         elif file_extension == 'pdf':
-            document = pypdf.PdfReader(uploaded_file)
-            pages_text = []
+            document = extract_text_from_pdf(uploaded_file)
 
-            for page in document.pages: 
-                page_text = page.extract_text() 
-                if page_text: 
-                    pages_text.append(page_text)
-            
-            document_text = "\n".join(pages_text)
-
-            if not document_text:
-                ("Could not extract text from this PDF.")
-                
         else:
             st.error("Unsupported file type.")
     
